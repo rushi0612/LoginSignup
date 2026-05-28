@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const [isLoginMode, setIsLoginMode] = useState(true)
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' })
   const [errors, setErrors] = useState({})
@@ -40,7 +40,6 @@ const Login = () => {
     }
 
     if (!isLoginMode) {
-      // Signup — save to localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]')
       const exists = users.find(u => u.email === formData.email)
       if (exists) {
@@ -53,15 +52,14 @@ const Login = () => {
       setFormData({ name: '', email: '', password: '', confirmPassword: '' })
       setTimeout(() => setIsLoginMode(true), 1500)
     } else {
-      // Login — check localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]')
       const user = users.find(u => u.email === formData.email && u.password === formData.password)
       if (!user) {
         setErrors({ email: 'Invalid email or password' })
         return
       }
-      setSuccessMsg(`Welcome back, ${user.name}! ✅`)
-      setFormData({ name: '', email: '', password: '', confirmPassword: '' })
+      // Go to dashboard
+      onLoginSuccess(user)
     }
   }
 
@@ -74,67 +72,51 @@ const Login = () => {
 
   return (
     <div className="w-[430px] bg-white p-8 rounded-2xl shadow-lg">
-      {/* Header */}
       <div className="flex justify-center mb-4">
         <h2 className="text-3xl font-semibold text-center">{isLoginMode ? 'Login' : 'Sign Up'}</h2>
       </div>
 
-      {/* Tab Toggle */}
       <div className="relative flex h-12 border border-gray-300 rounded-full overflow-hidden mb-4">
-        <button type="button" onClick={() => switchMode()} className={`w-1/2 text-lg font-medium transition-all z-10 ${isLoginMode ? 'text-white' : 'text-black'}`}>
+        <button type="button" onClick={switchMode} className={`w-1/2 text-lg font-medium transition-all z-10 ${isLoginMode ? 'text-white' : 'text-black'}`}>
           Login
         </button>
-        <button type="button" onClick={() => switchMode()} className={`w-1/2 text-lg font-medium transition-all z-10 ${!isLoginMode ? 'text-white' : 'text-black'}`}>
+        <button type="button" onClick={switchMode} className={`w-1/2 text-lg font-medium transition-all z-10 ${!isLoginMode ? 'text-white' : 'text-black'}`}>
           Sign Up
         </button>
         <div className={`absolute top-0 h-full w-1/2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-200 transition-all duration-300 ${isLoginMode ? 'left-0' : 'left-1/2'}`}></div>
       </div>
 
-      {/* Success Message */}
       {successMsg && (
         <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-center text-sm font-medium">
           {successMsg}
         </div>
       )}
 
-      {/* Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
         {!isLoginMode && (
           <div>
-            <input
-              type="text" name="name" placeholder="Name" value={formData.name}
-              onChange={handleChange}
-              className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.name ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`}
-            />
+            <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange}
+              className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.name ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`} />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
         )}
 
         <div>
-          <input
-            type="email" name="email" placeholder="Email Address" value={formData.email}
-            onChange={handleChange}
-            className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.email ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`}
-          />
+          <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange}
+            className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.email ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`} />
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
         </div>
 
         <div>
-          <input
-            type="password" name="password" placeholder="Password" value={formData.password}
-            onChange={handleChange}
-            className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.password ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`}
-          />
+          <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange}
+            className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.password ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`} />
           {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
         </div>
 
         {!isLoginMode && (
           <div>
-            <input
-              type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword}
-              onChange={handleChange}
-              className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.confirmPassword ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`}
-            />
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange}
+              className={`w-full p-3 border-b-2 outline-none placeholder-gray-400 ${errors.confirmPassword ? 'border-red-400' : 'border-gray-300 focus:border-cyan-500'}`} />
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
         )}
